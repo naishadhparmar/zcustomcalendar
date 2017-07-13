@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomCalendar">
+        <attr name="month_year_format" format="enum">
+            <enum name="three_letter_month__with_year" value="0"/>
+            <enum name="full_month__with_year" value="1"/>
+        </attr>
+        <attr name="day_of_week_length" format="integer"/>
+        <attr name="row_height" format="dimension"/>
+        <attr name="day_of_week_start_from" format="enum">
+            <enum name="sunday" value="0"/>
+            <enum name="monday" value="1"/>
+            <enum name="tuesday" value="2"/>
+            <enum name="wednesday" value="3"/>
+            <enum name="thursday" value="4"/>
+            <enum name="friday" value="5"/>
+            <enum name="saturday" value="6"/>
+        </attr>
+        <attr name="left_button_src" format="reference"/>
+        <attr name="right_button_src" format="reference"/>
+    </declare-styleable>
+</resources>
