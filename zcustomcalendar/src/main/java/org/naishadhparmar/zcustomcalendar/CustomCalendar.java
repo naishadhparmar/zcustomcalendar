@@ -23,11 +23,21 @@ import java.util.Map;
  * @version 1.0
  * @since 2017-07-14
  */
-
 public class CustomCalendar extends LinearLayout {
 	
 	public static final int PREVIOUS = -1;
 	public static final int NEXT = 1;
+	
+	public static final int THREE_LETTER_MONTH__WITH_YEAR = 0;
+	public static final int FULL_MONTH__WITH_YEAR = 1;
+
+	public static final int SUNDAY = 0;
+	public static final int MONDAY = 1;
+	public static final int TUESDAY = 2;
+	public static final int WEDNESDAY = 3;
+	public static final int THURSDAY = 4;
+	public static final int FRIDAY = 5;
+	public static final int SATURDAY = 6;
 	
 	private final String[] MONTHS = new String[] {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 	
@@ -57,7 +67,7 @@ public class CustomCalendar extends LinearLayout {
 	private Map<Object, Property> mapDescToProp = null;
 	
 	/**
-	 * Constructor that is called when inflating from XML
+	 * Constructor that is called when inflating from XML.
 	 * @param context The Context the view is running in, through which it can access the current theme, resources, etc.
 	 * @param attrs The attributes of the XML tag that is inflating the view.
 	 */
@@ -152,25 +162,17 @@ public class CustomCalendar extends LinearLayout {
 		int j = thisMonth.get(Calendar.DAY_OF_WEEK)-startFrom-1;
 		for(int i = 0 ; i < j ; i++) {
 			View btn = null;
-			if(mapDescToProp != null && mapDescToProp.get("disabled") != null) {
+			if(mapDescToProp != null && mapDescToProp.get("disabled") != null && mapDescToProp.get("disabled").layoutResource != -1) {
 				Property prop = mapDescToProp.get("disabled");
-				if (prop.layoutResource != -1) {
-					btn = LayoutInflater.from(context).inflate(prop.layoutResource, null);
-					if(prop.dateTextViewResource != -1) {
-						((TextView)btn.findViewById(prop.dateTextViewResource)).setText("" + (previousMonth.getActualMaximum(Calendar.DAY_OF_MONTH)-(j-i-1)));
-					}
-				}
-				else {
-					btn = new Button(context);
-					((Button)btn).setText("" + (previousMonth.getActualMaximum(Calendar.DAY_OF_MONTH)-(j-i-1)));
-				}
+				btn =  LayoutInflater.from(context).inflate(prop.layoutResource, null);
+				if(prop.dateTextViewResource != -1 && btn.findViewById(prop.dateTextViewResource) != null) ((TextView)btn.findViewById(prop.dateTextViewResource)).setText("" + (previousMonth.getActualMaximum(Calendar.DAY_OF_MONTH)-(j-i-1)));
 			}
 			else {
 				btn = new Button(context);
 				((Button)btn).setText("" + (previousMonth.getActualMaximum(Calendar.DAY_OF_MONTH)-(j-i-1)));
 			}
-			llWeek.addView(btn);
 			btn.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT, 1));
+			llWeek.addView(btn);
 			btn.setEnabled(false);
 		}
 		int index = 0;
@@ -207,8 +209,7 @@ public class CustomCalendar extends LinearLayout {
 			if(mapDescToProp != null && mapDescToProp.get("disabled") != null) {
 				Property prop = mapDescToProp.get("disabled");
 				btn =  LayoutInflater.from(context).inflate(prop.layoutResource, null);
-				btn.setEnabled(false);
-				((TextView)btn.findViewById(prop.dateTextViewResource)).setText("" + k);
+				if(prop.dateTextViewResource != -1 && btn.findViewById(prop.dateTextViewResource) != null) ((TextView)btn.findViewById(prop.dateTextViewResource)).setText("" + k);
 			}
 			else {
 				btn = new Button(context);
@@ -256,15 +257,21 @@ public class CustomCalendar extends LinearLayout {
 			else {
 				prop = mapDescToProp.get("default");
 			}
-			btn = LayoutInflater.from(context).inflate(prop.layoutResource, null);
-			if (!prop.enable) btn.setEnabled(false);
-			((TextView) btn.findViewById(prop.dateTextViewResource)).setText("" + date);
+			if(prop != null) {
+				btn = LayoutInflater.from(context).inflate(prop.layoutResource, null);
+				if (prop.dateTextViewResource != -1 && btn.findViewById(prop.dateTextViewResource) != null)
+					((TextView) btn.findViewById(prop.dateTextViewResource)).setText("" + date);
+				if (!prop.enable) btn.setEnabled(false);
+			}
+			else {
+				btn = new Button(context);
+				((Button)btn).setText("" + date);
+			}
 		}
 		else {
 			btn = new Button(context);
 			((Button)btn).setText("" + date);
 		}
-		Log.i("height", btn.getHeight() + "");
 		btn.setLayoutParams(new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 		if(mapDateToTag != null) btn.setTag(mapDateToTag.get(new Integer(date)));
 		btn.setOnClickListener(new OnClickListener() {
@@ -284,6 +291,73 @@ public class CustomCalendar extends LinearLayout {
 			selectedButton = btn;
 		}
 		return btn;
+	}
+	
+	
+	/**
+	 * Set the format in which the month and the year are displayed on the top.
+	 * @param monthYearFormat Either {@code CustomCalendar.THREE_LETTER_MONTH__WITH_YEAR} or {@code CustomCalendar.FULL_MONTH__WITH_YEAR}.
+	 */
+	public void setMonthYearFormat(int monthYearFormat) {
+		this.monthYearFormat = monthYearFormat;
+		readyMonthAndYear();
+	}
+	
+	/**
+	 * Set the length of the day of week displayed above the dates.
+	 * @param length length of the day of week.
+	 */
+	public void setDayOfWeekLength(int length) {
+		this.dayOfWeekLength = length;
+		readyDaysOfWeek();
+	}
+	
+	/**
+	 * Set the height of every row of the CustomCalendar.
+	 * @param rowHeight Height of the row.
+	 */
+	public void setRowHeight(float rowHeight) {
+		if(rowHeight>0) {
+			this.rowHeight = rowHeight;
+			setAll();
+		}
+	}
+	
+	/**
+	 * Set the day of week from which the calendar starts.
+	 * @param whichDay {@code CustomCalendar.SUNDAY}, {@code CustomCalendar.MONDAY}, {@code CustomCalendar.TUESDAY}, {@code CustomCalendar.WEDNESDAY}, {@code CustomCalendar.THURSDAY}, {@code CustomCalendar.FRIDAY} or {@code CustomCalendar.SATURDAY}.
+	 */
+	public void setDayOfWeekStartFrom(int whichDay) {
+		startFrom = whichDay;
+		setAll();
+	}
+	
+	/**
+	 * Set the drawable on a navigation button.
+	 * @param whichButton Either {@code CustomCalendar.PREVIOUS} or {@code CustomCalendar.NEXT}.
+	 * @param resourceId Resource id of the drawable.
+	 */
+	public void setNavigationButtonDrawable(int whichButton, int resourceId) {
+		switch(whichButton) {
+			case PREVIOUS: butLeft.setImageResource(resourceId);
+							break;
+			case NEXT: butRight.setImageResource(resourceId);
+						break;
+		}
+	}
+	
+	/**
+	 * Set the drawable on a navigation button.
+	 * @param whichButton Either {@code CustomCalendar.PREVIOUS} or {@code CustomCalendar.NEXT}.
+	 * @param drawable Drawable to be set.
+	 */
+	public void setNavigationButtonDrawable(int whichButton, Drawable drawable) {
+		switch(whichButton) {
+			case PREVIOUS: butLeft.setImageDrawable(drawable);
+				break;
+			case NEXT: butRight.setImageDrawable(drawable);
+				break;
+		}
 	}
 	
 	/**
@@ -321,8 +395,8 @@ public class CustomCalendar extends LinearLayout {
 	}
 	
 	/**
-	 * Set the map linking a description to its respective Property object
-	 * @param mapDescToProp The map linking description to its property
+	 * Set the map linking a description to its respective Property object.
+	 * @param mapDescToProp The map linking description to its property.
 	 */
 	public void setMapDescToProp(Map<Object, Property> mapDescToProp) {
 		this.mapDescToProp = mapDescToProp;
@@ -331,27 +405,17 @@ public class CustomCalendar extends LinearLayout {
 	
 	/**
 	 * Register a callback to be invoked when a date is clicked.
-	 * @param listener The callback that will run
+	 * @param listener The callback that will run.
 	 */
 	public void setOnDateSelectedListener(OnDateSelectedListener listener) {
 		this.listener = listener;
-	}
-	
-	/**
-	 * Set the height of every row of the CustomCalendar
-	 * @param rowHeight Height of the row
-	 */
-	public void setRowHeight(float rowHeight) {
-		if(rowHeight>0) {
-			this.rowHeight = rowHeight;
-			setAll();
-		}
+		readyMonthAndYear();
 	}
 	
 	/**
 	 * Register a callback to be invoked when a month navigation button is clicked.
-	 * @param whichButton Either {@code CustomCalendar.PREVIOUS} or {@code CustomCalendar.NEXT}
-	 * @param listener The callback that will run
+	 * @param whichButton Either {@code CustomCalendar.PREVIOUS} or {@code CustomCalendar.NEXT}.
+	 * @param listener The callback that will run.
 	 */
 	public void setOnNavigationButtonClickedListener(int whichButton, OnNavigationButtonClickedListener listener) {
 		if(whichButton == PREVIOUS) leftButtonListener = listener;
@@ -359,8 +423,8 @@ public class CustomCalendar extends LinearLayout {
 	}
 	
 	/**
-	 * Set the enabled state of a month navigation button
-	 * @param whichButton Either {@code CustomCalendar.PREVIOUS} or {@code CustomCalendar.NEXT}
+	 * Set the enabled state of a month navigation button.
+	 * @param whichButton Either {@code CustomCalendar.PREVIOUS} or {@code CustomCalendar.NEXT}.
 	 * @param enable True if the button is enabled, false otherwise.
 	 */
 	public void setNavigationButtonEnabled(int whichButton, boolean enable) {
@@ -369,8 +433,16 @@ public class CustomCalendar extends LinearLayout {
 	}
 	
 	/**
+	 * Returns the TextView that shows the month and the year.
+	 * @return The TextView that shows the month and the year.
+	 */
+	public TextView getMonthYearTextView() {
+		return tvMonthYear;
+	}
+	
+	/**
 	 * Returns an array of all the date views.
-	 * @return An array of all the date views. (Does not include the disabled previous month and next month views shown for continuity)
+	 * @return An array of all the date views. Does not include the disabled previous month and next month views shown for continuity.
 	 */
 	public View[] getAllViews() {
 		return btnAll;
