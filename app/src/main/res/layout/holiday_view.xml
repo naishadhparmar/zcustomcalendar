@@ -5,21 +5,21 @@
     android:layout_height="match_parent"
     android:padding="2dp"
     android:layout_margin="2dp"
-    android:background="@drawable/default_view_selector">
+    android:background="@drawable/holiday_view_selector">
 
     <TextView
-        android:id="@+id/default_datetextview"
+        android:id="@+id/holiday_datetextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="@drawable/default_datetextview_selector"
+        android:background="@drawable/holiday_datetextview_selector"
         android:textColor="@color/default_text_selector"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/default_datetextview"
+        android:layout_below="@id/holiday_datetextview"
         android:background="@color/colorAccent"/>
 
 </RelativeLayout>

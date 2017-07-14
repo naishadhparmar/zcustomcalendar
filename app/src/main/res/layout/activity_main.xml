@@ -9,7 +9,7 @@
 
     <org.naishadhparmar.zcustomcalendar.CustomCalendar
         android:id="@+id/custom_calendar"
-        android:layout_width="368dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:day_of_week_length="1"
         app:day_of_week_start_from="sunday"

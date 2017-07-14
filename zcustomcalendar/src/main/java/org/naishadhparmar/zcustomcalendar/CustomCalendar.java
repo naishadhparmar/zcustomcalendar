@@ -247,21 +247,14 @@ public class CustomCalendar extends LinearLayout {
 	private View readyButton(final int date) {
 		final View btn;
 		if(mapDescToProp != null) {
-			Property prop = null;
-			if(mapDateToDesc != null) {
-				boolean useDefault = false;
-				if (mapDateToDesc.get(new Integer(date)) == null || mapDateToDesc.get(new Integer(date)).equals("default"))
-					useDefault = true;
-				prop = useDefault ? mapDescToProp.get("default") : mapDescToProp.get(mapDateToDesc.get(new Integer(date)));
+			Property prop = mapDescToProp.get("default");
+			if(mapDateToDesc != null && mapDateToDesc.get(new Integer(date)) != null && !mapDateToDesc.get(new Integer(date)).equals("default")) {
+				prop = mapDescToProp.get(mapDateToDesc.get(new Integer(date)));
 			}
-			else {
-				prop = mapDescToProp.get("default");
-			}
-			if(prop != null) {
-				btn = LayoutInflater.from(context).inflate(prop.layoutResource, null);
-				if (prop.dateTextViewResource != -1 && btn.findViewById(prop.dateTextViewResource) != null)
-					((TextView) btn.findViewById(prop.dateTextViewResource)).setText("" + date);
-				if (!prop.enable) btn.setEnabled(false);
+			if(prop != null && prop.layoutResource!=-1) {
+				btn=LayoutInflater.from(context).inflate(prop.layoutResource, null);
+				if(prop.dateTextViewResource!=-1) ((TextView)btn.findViewById(prop.dateTextViewResource)).setText("" +date);
+				btn.setEnabled(prop.enable);
 			}
 			else {
 				btn = new Button(context);

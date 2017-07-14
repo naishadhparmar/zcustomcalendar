@@ -27,12 +27,11 @@ public class ActivityMain extends AppCompatActivity {
 		propDefault.dateTextViewResource = R.id.default_datetextview;
 		mapDescToProp.put("default", propDefault);
 		
-//		Property propUnavailable = new Property();
-//		propUnavailable.layoutResource = R.layout.unavailable_view;
-//		propUnavailable.dateTextViewResource = -1;
-//		//You can leave the text view field blank. Custom calendar won't try to set a date on such views
-//		propUnavailable.enable = false;
-//		mapDescToProp.put("unavailable", propUnavailable);
+		Property propUnavailable = new Property();
+		propUnavailable.layoutResource = R.layout.unavailable_view;
+		//You can leave the text view field blank. Custom calendar won't try to set a date on such views
+		propUnavailable.enable = false;
+		mapDescToProp.put("unavailable", propUnavailable);
 		
 		Property propHoliday = new Property();
 		propHoliday.layoutResource = R.layout.holiday_view;
