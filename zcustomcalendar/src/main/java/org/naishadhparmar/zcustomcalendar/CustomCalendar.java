@@ -370,7 +370,6 @@ public class CustomCalendar extends LinearLayout {
 	public void setDate(Calendar calendar, Map<Integer, Object> mapDateToDesc) {
 		this.selectedDate = calendar;
 		this.mapDateToDesc = mapDateToDesc;
-		this.mapDateToTag = mapDateToTag;
 		setAll();
 	}
 	
@@ -441,4 +440,11 @@ public class CustomCalendar extends LinearLayout {
 		return btnAll;
 	}
 	
+	/**
+	 * Returns a Calendar representation of the selected date.
+	 * @return A Calendar representation of the selected date.
+	 */
+	public Calendar getSelectedDate() {
+		return selectedDate;
+	}
 }
